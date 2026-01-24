@@ -75,9 +75,13 @@ h1, h2, h3 {
     var(--zap-yellow),
     var(--zap-green)
   );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+
+  background-clip: text;          /* standard */
+  -webkit-background-clip: text;  /* safari */
+
+  color: transparent;
 }
+
 
 /* ===============================
    GLASS CARDS
