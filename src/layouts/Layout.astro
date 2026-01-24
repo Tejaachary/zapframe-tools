@@ -7,9 +7,46 @@ import "../styles/global.css";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ZapFrame Tools</title>
+    <title>ZapFrame</title>
+    <meta
+      name="description"
+      content="ZapFrame — curated tools for creators."
+    />
   </head>
-  <body class="bg-black text-white">
-    <slot />
+
+  <body class="antialiased relative">
+    <!-- Header -->
+    <header class="bg-white/70 backdrop-blur border-b border-gray-200">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+        <a href="/" class="text-xl font-bold flex items-center gap-2">
+          ⚡ <span class="gradient-text">ZapFrame</span>
+        </a>
+
+        <span class="text-sm text-gray-500">
+          Curated creator tools
+        </span>
+      </div>
+    </header>
+
+    <!-- Floating Symbols -->
+    <div class="pointer-events-none">
+      <span class="floating-icon" style="top: 120px; left: 10%">🎬</span>
+      <span class="floating-icon" style="top: 260px; left: 80%">🎵</span>
+      <span class="floating-icon" style="top: 420px; left: 25%">✂️</span>
+      <span class="floating-icon" style="top: 180px; left: 60%">📸</span>
+      <span class="floating-icon" style="top: 520px; left: 75%">🖥️</span>
+    </div>
+
+    <!-- Content -->
+    <main class="max-w-6xl mx-auto px-4 py-20 relative z-10">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 bg-white/70">
+      <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-gray-500">
+        © {new Date().getFullYear()} ZapFrame — Built for creators
+      </div>
+    </footer>
   </body>
 </html>

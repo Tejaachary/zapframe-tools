@@ -9,7 +9,7 @@ type Category = {
 };
 
 const categories: Category[] = await sanityClient.fetch(`
-  *[_type == "category"] | order(order asc) {
+  *[_type == "category"] {
     _id,
     name,
     "slug": slug.current
@@ -18,24 +18,42 @@ const categories: Category[] = await sanityClient.fetch(`
 ---
 
 <Layout>
-  <main class="max-w-4xl mx-auto py-16">
-    <h1 class="text-3xl font-bold mb-8">Categories</h1>
+  <!-- HERO -->
+  <section class="mb-32">
+    <h1 class="text-6xl font-bold leading-tight mb-6">
+      Stop searching.<br />
+      <span class="gradient-text">Just use ZapFrame.</span>
+    </h1>
 
-    <ul class="space-y-4">
+    <p class="text-gray-600 max-w-2xl text-lg">
+      A curated list of the best free and useful tools for content creators,
+      video editors, and beginners.
+    </p>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section>
+    <h2 class="text-2xl font-semibold mb-10">
+      Categories
+    </h2>
+
+    <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
       {categories.map((cat) => (
-        
         <li>
-  <a
-    href={`/${cat.slug}`}
-    class="text-xl text-blue-400 hover:underline"
-  >
-    • {cat.name}
-  </a>
-</li>
+          <a
+            href={`/${cat.slug}`}
+            class="glass card-hover block rounded-2xl p-8"
+          >
+            <h3 class="text-xl font-semibold mb-2">
+              {cat.name}
+            </h3>
 
-
-
+            <p class="text-sm text-gray-500">
+              Best tools for {cat.name.toLowerCase()}
+            </p>
+          </a>
+        </li>
       ))}
     </ul>
-  </main>
+  </section>
 </Layout>

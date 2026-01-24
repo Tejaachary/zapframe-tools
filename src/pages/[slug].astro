@@ -2,23 +2,13 @@
 import Layout from "../layouts/Layout.astro";
 import { sanityClient } from "../lib/sanity";
 
-/* Generate static pages for each category */
-export async function getStaticPaths() {
-  const categories: { slug: string }[] = await sanityClient.fetch(`
-    *[_type == "category"] {
-      "slug": slug.current
-    }
-  `);
+/* -----------------------------
+   Types
+------------------------------ */
+type CategorySlug = {
+  slug: string;
+};
 
-  return categories.map((cat) => ({
-    params: { slug: cat.slug },
-  }));
-}
-
-/* Safely get slug param */
-const slug = Astro.params.slug as string;
-
-/* Fetch tools for the category */
 type Tool = {
   _id: string;
   name: string;
@@ -27,6 +17,29 @@ type Tool = {
   isFree: boolean;
 };
 
+/* -----------------------------
+   Static Paths
+------------------------------ */
+export async function getStaticPaths() {
+  const categories: CategorySlug[] = await sanityClient.fetch(`
+    *[_type == "category"] {
+      "slug": slug.current
+    }
+  `);
+
+  return categories.map((cat: CategorySlug) => ({
+    params: { slug: cat.slug },
+  }));
+}
+
+/* -----------------------------
+   Page Params
+------------------------------ */
+const slug = Astro.params.slug as string;
+
+/* -----------------------------
+   Fetch Tools
+------------------------------ */
 const tools: Tool[] = await sanityClient.fetch(
   `
   *[_type == "tool" && category->slug.current == $slug] {
@@ -40,54 +53,54 @@ const tools: Tool[] = await sanityClient.fetch(
   { slug }
 );
 
-/* Convert slug to title */
-const pageTitle = slug
+/* -----------------------------
+   Title Formatting
+------------------------------ */
+const title = slug
   .split("-")
-  .map(word => word[0].toUpperCase() + word.slice(1))
+  .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
   .join(" ");
 ---
 
 <Layout>
-  <main class="max-w-4xl mx-auto py-16 px-4">
-    <h1 class="text-3xl font-bold mb-10">
-      {pageTitle}
-    </h1>
+  <h1 class="text-5xl font-bold mb-16">
+    <span class="gradient-text">{title}</span>
+  </h1>
 
-    {tools.length === 0 ? (
-      <p class="text-gray-400">
-        No tools added yet.
-      </p>
-    ) : (
-      <ul class="grid gap-6">
-        {tools.map((tool) => (
-          <li class="border border-gray-800 p-5 rounded-lg hover:border-gray-600 transition">
-            <h2 class="text-xl font-semibold">
+  {tools.length === 0 ? (
+    <p class="text-gray-500">
+      Tools are being curated. Check back soon.
+    </p>
+  ) : (
+    <ul class="grid gap-10">
+      {tools.map((tool: Tool) => (
+        <li class="glass card-hover rounded-2xl p-6">
+          <div class="flex justify-between items-start">
+            <h2 class="text-lg font-semibold">
               {tool.name}
             </h2>
 
-            <p class="text-gray-400 mt-2">
-              {tool.description}
-            </p>
+            {tool.isFree && (
+              <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                Free
+              </span>
+            )}
+          </div>
 
-            <div class="mt-3 flex items-center gap-4">
-              <a
-                href={tool.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-blue-400 hover:underline"
-              >
-                Visit tool →
-              </a>
+          <p class="text-gray-500 mt-3 text-sm">
+            {tool.description}
+          </p>
 
-              {tool.isFree && (
-                <span class="text-xs bg-green-600/20 text-green-400 px-2 py-1 rounded">
-                  Free
-                </span>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
-    )}
-  </main>
+          <a
+            href={tool.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-block mt-4 text-blue-600 hover:underline text-sm"
+          >
+            Visit tool →
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
 </Layout>
