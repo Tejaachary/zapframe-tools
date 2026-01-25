@@ -12,6 +12,7 @@ type Tool = {
   url: string;
   isFree: boolean;
   platform: "mobile" | "pc" | "both";
+  featured?: boolean;
 };
 
 /* =============================
@@ -45,22 +46,23 @@ const tools: Tool[] = await sanityClient.fetch(
     description,
     url,
     isFree,
-    platform
+    platform,
+    featured
   }
   `,
   { slug }
 );
 
 /* =============================
-   Split tools
+   Split + sort tools
 ============================= */
-const mobileTools = tools.filter(
-  (tool) => tool.platform === "mobile" || tool.platform === "both"
-);
+const mobileTools = tools
+  .filter((t) => t.platform === "mobile" || t.platform === "both")
+  .sort((a, b) => Number(b.featured) - Number(a.featured));
 
-const pcTools = tools.filter(
-  (tool) => tool.platform === "pc" || tool.platform === "both"
-);
+const pcTools = tools
+  .filter((t) => t.platform === "pc" || t.platform === "both")
+  .sort((a, b) => Number(b.featured) - Number(a.featured));
 
 /* =============================
    Title
@@ -72,81 +74,129 @@ const title = slug
 ---
 
 <Layout>
-  <!-- Title -->
   <h1 class="text-5xl font-bold mb-14">
     <span class="gradient-text">{title}</span>
   </h1>
 
-  <!-- Two Column Layout -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-    
-    <!-- MOBILE COLUMN -->
+  <!-- Two Column Table -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-14">
+
+    <!-- MOBILE -->
     <section>
       <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
         📱 Mobile
       </h2>
 
-      {mobileTools.length === 0 ? (
-        <p class="text-gray-500">No mobile tools added yet.</p>
-      ) : (
-        <ul class="space-y-6">
-          {mobileTools.map((tool) => (
-            <li class="glass card-hover rounded-2xl p-6">
-              <h3 class="text-lg font-semibold">
-                {tool.name}
-              </h3>
+      <ul class="space-y-6">
+        {mobileTools.map((tool) => (
+          <li class="glass card-hover rounded-2xl p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-semibold">{tool.name}</h3>
 
-              <p class="text-gray-500 mt-2 text-sm">
-                {tool.description}
-              </p>
+              <div class="flex gap-2">
+                {tool.featured && (
+                  <span class="badge badge-featured">Recommended</span>
+                )}
+                <span class="badge badge-mobile">
+                  {tool.platform === "both" ? "Mobile + PC" : "Mobile"}
+                </span>
+              </div>
+            </div>
 
-              <a
-                href={tool.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-block mt-4 text-sm font-medium text-blue-600 hover:underline"
-              >
-                Download tool →
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
+            <p class="text-gray-500 mt-2 text-sm">
+              {tool.description}
+            </p>
+
+            <a
+              href={tool.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="download-btn"
+            >
+              ⬇ Download tool
+            </a>
+          </li>
+        ))}
+      </ul>
     </section>
 
-    <!-- PC COLUMN -->
+    <!-- PC -->
     <section>
       <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
         💻 PC
       </h2>
 
-      {pcTools.length === 0 ? (
-        <p class="text-gray-500">No PC tools added yet.</p>
-      ) : (
-        <ul class="space-y-6">
-          {pcTools.map((tool) => (
-            <li class="glass card-hover rounded-2xl p-6">
-              <h3 class="text-lg font-semibold">
-                {tool.name}
-              </h3>
+      <ul class="space-y-6">
+        {pcTools.map((tool) => (
+          <li class="glass card-hover rounded-2xl p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-semibold">{tool.name}</h3>
 
-              <p class="text-gray-500 mt-2 text-sm">
-                {tool.description}
-              </p>
+              <div class="flex gap-2">
+                {tool.featured && (
+                  <span class="badge badge-featured">Recommended</span>
+                )}
+                <span class="badge badge-pc">
+                  {tool.platform === "both" ? "Mobile + PC" : "PC"}
+                </span>
+              </div>
+            </div>
 
-              <a
-                href={tool.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-block mt-4 text-sm font-medium text-blue-600 hover:underline"
-              >
-                Download tool →
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
+            <p class="text-gray-500 mt-2 text-sm">
+              {tool.description}
+            </p>
+
+            <a
+              href={tool.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="download-btn"
+            >
+              ⬇ Download tool
+            </a>
+          </li>
+        ))}
+      </ul>
     </section>
 
   </div>
+
+  <!-- Styles -->
+  <style>
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .badge-mobile {
+      background: rgba(66, 133, 244, 0.15);
+      color: #1d4ed8;
+    }
+
+    .badge-pc {
+      background: rgba(34, 197, 94, 0.15);
+      color: #15803d;
+    }
+
+    .badge-featured {
+      background: rgba(251, 191, 36, 0.2);
+      color: #92400e;
+    }
+
+    .download-btn {
+      display: inline-block;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    .download-btn:hover {
+      text-decoration: underline;
+    }
+  </style>
 </Layout>
