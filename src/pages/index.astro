@@ -2,17 +2,38 @@
 import Layout from "../layouts/Layout.astro";
 import { sanityClient } from "../lib/sanity";
 
+/* =============================
+   Types
+============================= */
 type Category = {
   _id: string;
   name: string;
   slug: string;
 };
 
+type Tool = {
+  name: string;
+  url: string;
+};
+
+/* =============================
+   Fetch categories
+============================= */
 const categories: Category[] = await sanityClient.fetch(`
   *[_type == "category"] {
     _id,
     name,
     "slug": slug.current
+  }
+`);
+
+/* =============================
+   Fetch tools for search
+============================= */
+const tools: Tool[] = await sanityClient.fetch(`
+  *[_type == "tool"]{
+    name,
+    url
   }
 `);
 ---
@@ -29,6 +50,27 @@ const categories: Category[] = await sanityClient.fetch(`
       A curated list of the best free and useful tools for content creators,
       video editors, and beginners.
     </p>
+
+    <!-- SEARCH -->
+    <div class="relative max-w-xl mt-10">
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Search tools (CapCut, Canva, DaVinci...)"
+        class="w-full rounded-2xl border border-gray-200 px-12 py-4 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+      />
+
+      <!-- Magnifier -->
+      <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+        🔍
+      </span>
+
+      <!-- Results -->
+      <ul
+        id="results"
+        class="absolute z-10 mt-3 w-full rounded-2xl bg-white shadow-lg hidden overflow-hidden"
+      ></ul>
+    </div>
   </section>
 
   <!-- CATEGORIES -->
@@ -56,4 +98,60 @@ const categories: Category[] = await sanityClient.fetch(`
       ))}
     </ul>
   </section>
+
+  <!-- SEARCH DATA -->
+  <script id="tools-data" type="application/json">
+    {JSON.stringify(tools)}
+  </script>
+
+  <!-- SEARCH SCRIPT (ASTRO SAFE) -->
+  <script is:inline>
+    const tools = JSON.parse(
+      document.getElementById("tools-data")?.textContent || "[]"
+    );
+
+    const input = document.getElementById("searchInput");
+    const results = document.getElementById("results");
+
+    if (!input || !results) return;
+
+    input.addEventListener("input", () => {
+      const value = input.value.toLowerCase().trim();
+      results.innerHTML = "";
+
+      if (!value) {
+        results.classList.add("hidden");
+        return;
+      }
+
+      const matches = tools.filter(tool =>
+        tool.name.toLowerCase().includes(value)
+      );
+
+      if (matches.length === 0) {
+        results.innerHTML = `
+          <li class="px-4 py-3 text-sm text-gray-500">
+            No tools found
+          </li>
+        `;
+      } else {
+        matches.slice(0, 8).forEach(tool => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <a
+              href="${tool.url}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="block px-4 py-3 text-sm hover:bg-gray-100"
+            >
+              🔗 ${tool.name}
+            </a>
+          `;
+          results.appendChild(li);
+        });
+      }
+
+      results.classList.remove("hidden");
+    });
+  </script>
 </Layout>
