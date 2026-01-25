@@ -2,9 +2,6 @@
 import Layout from "../layouts/Layout.astro";
 import { sanityClient } from "../lib/sanity";
 
-/* =============================
-   Types
-============================= */
 type Tool = {
   _id: string;
   name: string;
@@ -13,11 +10,9 @@ type Tool = {
   isFree: boolean;
   platform: "mobile" | "pc" | "both";
   featured?: boolean;
+  logoUrl?: string;
 };
 
-/* =============================
-   Static paths
-============================= */
 export async function getStaticPaths() {
   const categories: { slug: string }[] = await sanityClient.fetch(`
     *[_type == "category"] {
@@ -30,14 +25,8 @@ export async function getStaticPaths() {
   }));
 }
 
-/* =============================
-   Params
-============================= */
 const slug = Astro.params.slug as string;
 
-/* =============================
-   Fetch tools
-============================= */
 const tools: Tool[] = await sanityClient.fetch(
   `
   *[_type == "tool" && category->slug.current == $slug] {
@@ -47,15 +36,13 @@ const tools: Tool[] = await sanityClient.fetch(
     url,
     isFree,
     platform,
-    featured
+    featured,
+    "logoUrl": logo.asset->url
   }
   `,
   { slug }
 );
 
-/* =============================
-   Split + sort tools
-============================= */
 const mobileTools = tools
   .filter((t) => t.platform === "mobile" || t.platform === "both")
   .sort((a, b) => Number(b.featured) - Number(a.featured));
@@ -64,9 +51,6 @@ const pcTools = tools
   .filter((t) => t.platform === "pc" || t.platform === "both")
   .sort((a, b) => Number(b.featured) - Number(a.featured));
 
-/* =============================
-   Title
-============================= */
 const title = slug
   .split("-")
   .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -78,7 +62,6 @@ const title = slug
     <span class="gradient-text">{title}</span>
   </h1>
 
-  <!-- Two Column Table -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-14">
 
     <!-- MOBILE -->
@@ -90,8 +73,18 @@ const title = slug
       <ul class="space-y-6">
         {mobileTools.map((tool) => (
           <li class="glass card-hover rounded-2xl p-6">
-            <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold">{tool.name}</h3>
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                {tool.logoUrl && (
+                  <img
+                    src={tool.logoUrl}
+                    alt={`${tool.name} logo`}
+                    class="w-10 h-10 object-contain rounded-md bg-white/70 p-1"
+                    loading="lazy"
+                  />
+                )}
+                <h3 class="text-lg font-semibold">{tool.name}</h3>
+              </div>
 
               <div class="flex gap-2">
                 {tool.featured && (
@@ -129,8 +122,18 @@ const title = slug
       <ul class="space-y-6">
         {pcTools.map((tool) => (
           <li class="glass card-hover rounded-2xl p-6">
-            <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold">{tool.name}</h3>
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                {tool.logoUrl && (
+                  <img
+                    src={tool.logoUrl}
+                    alt={`${tool.name} logo`}
+                    class="w-10 h-10 object-contain rounded-md bg-white/70 p-1"
+                    loading="lazy"
+                  />
+                )}
+                <h3 class="text-lg font-semibold">{tool.name}</h3>
+              </div>
 
               <div class="flex gap-2">
                 {tool.featured && (
@@ -161,14 +164,12 @@ const title = slug
 
   </div>
 
-  <!-- Styles -->
   <style>
     .badge {
       font-size: 0.7rem;
       padding: 0.25rem 0.6rem;
       border-radius: 9999px;
       font-weight: 500;
-      white-space: nowrap;
     }
 
     .badge-mobile {
@@ -192,7 +193,6 @@ const title = slug
       font-size: 0.85rem;
       font-weight: 600;
       color: #2563eb;
-      text-decoration: none;
     }
 
     .download-btn:hover {
