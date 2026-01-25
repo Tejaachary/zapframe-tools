@@ -7,25 +7,25 @@ import "../styles/global.css";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>ZapFrame</title>
     <meta
       name="description"
       content="ZapFrame — curated tools for creators."
     />
 
-    <!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-CFSJFWQ1H0"></script>
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CFSJFWQ1H0"></script>
 
-<script is:inline>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(...args) {
-    window.dataLayer.push(args);
-  }
-  gtag('js', new Date());
-  gtag('config', 'G-CFSJFWQ1H0');
-</script>
-<!-- End Google Analytics -->
-
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(...args) {
+        window.dataLayer.push(args);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-CFSJFWQ1H0');
+    </script>
+    <!-- End Google Analytics -->
   </head>
 
   <body class="antialiased relative">
@@ -51,7 +51,7 @@ import "../styles/global.css";
       <span class="floating-icon" style="top: 520px; left: 75%">🖥️</span>
     </div>
 
-    <!-- Content -->
+    <!-- Page Content -->
     <main class="max-w-6xl mx-auto px-4 py-20 relative z-10">
       <slot />
     </main>
