@@ -44,7 +44,7 @@ const tools: Tool[] = await sanityClient.fetch(`
 
     <!-- HEADLINE + SEARCH -->
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 mb-6">
-      
+
       <!-- HEADLINE -->
       <h1 class="text-6xl font-bold leading-tight">
         Stop searching.<br />
@@ -115,7 +115,6 @@ const tools: Tool[] = await sanityClient.fetch(`
   </script>
 
   <!-- ================= SEARCH SCRIPT ================= -->
-  <!-- Astro-safe, zero TS errors -->
   <script is:inline>
     const tools = JSON.parse(
       document.getElementById("tools-data")?.textContent || "[]"
@@ -126,21 +125,61 @@ const tools: Tool[] = await sanityClient.fetch(`
 
     if (!input || !results) return;
 
+    let currentMatches = [];
+    let activeIndex = -1;
+
     function highlightMatch(text, query) {
       const regex = new RegExp(`(${query})`, "ig");
       return text.replace(regex, "<strong>$1</strong>");
     }
 
-    input.addEventListener("input", () => {
-      const value = input.value.toLowerCase().trim();
+    function renderResults(matches, query) {
       results.innerHTML = "";
 
-      if (!value) {
-        results.classList.add("hidden");
+      if (matches.length === 0) {
+        results.innerHTML = `
+          <li class="px-4 py-3 text-sm text-gray-500">
+            No tools found
+          </li>
+        `;
         return;
       }
 
-      // Play Store style ordering
+      matches.forEach((tool, index) => {
+        const li = document.createElement("li");
+        li.className = "px-4 py-3 text-sm cursor-pointer transition";
+
+        if (index === activeIndex) {
+          li.classList.add("bg-gray-100", "font-semibold");
+        }
+
+        li.innerHTML = `
+          🔗 ${highlightMatch(tool.name, query)}
+        `;
+
+        li.addEventListener("mouseenter", () => {
+          activeIndex = index;
+          renderResults(currentMatches, query);
+        });
+
+        li.addEventListener("click", () => {
+          window.open(tool.url, "_blank");
+        });
+
+        results.appendChild(li);
+      });
+    }
+
+    input.addEventListener("input", () => {
+      const value = input.value.toLowerCase().trim();
+
+      if (!value) {
+        results.classList.add("hidden");
+        currentMatches = [];
+        activeIndex = -1;
+        return;
+      }
+
       const startsWith = tools.filter(tool =>
         tool.name.toLowerCase().startsWith(value)
       );
@@ -151,32 +190,34 @@ const tools: Tool[] = await sanityClient.fetch(`
           tool.name.toLowerCase().includes(value)
       );
 
-      const matches = [...startsWith, ...contains].slice(0, 8);
+      currentMatches = [...startsWith, ...contains].slice(0, 8);
+      activeIndex = 0;
 
-      if (matches.length === 0) {
-        results.innerHTML = `
-          <li class="px-4 py-3 text-sm text-gray-500">
-            No tools found
-          </li>
-        `;
-      } else {
-        matches.forEach(tool => {
-          const li = document.createElement("li");
-          li.innerHTML = `
-            <a
-              href="${tool.url}"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="block px-4 py-3 text-sm hover:bg-gray-100"
-            >
-              🔗 ${highlightMatch(tool.name, value)}
-            </a>
-          `;
-          results.appendChild(li);
-        });
+      renderResults(currentMatches, value);
+      results.classList.remove("hidden");
+    });
+
+    // Keyboard navigation
+    input.addEventListener("keydown", (e) => {
+      if (!currentMatches.length) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        activeIndex = (activeIndex + 1) % currentMatches.length;
+        renderResults(currentMatches, input.value);
       }
 
-      results.classList.remove("hidden");
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        activeIndex =
+          (activeIndex - 1 + currentMatches.length) %
+          currentMatches.length;
+        renderResults(currentMatches, input.value);
+      }
+
+      if (e.key === "Enter" && activeIndex >= 0) {
+        window.open(currentMatches[activeIndex].url, "_blank");
+      }
     });
   </script>
 
