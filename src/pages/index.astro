@@ -2,6 +2,9 @@
 import Layout from "../layouts/Layout.astro";
 import { sanityClient } from "../lib/sanity";
 
+/* =============================
+   Types
+============================= */
 type Category = {
   _id: string;
   name: string;
@@ -13,7 +16,9 @@ type Tool = {
   url: string;
 };
 
-/* Fetch categories */
+/* =============================
+   Fetch categories
+============================= */
 const categories: Category[] = await sanityClient.fetch(`
   *[_type == "category"] {
     _id,
@@ -22,7 +27,9 @@ const categories: Category[] = await sanityClient.fetch(`
   }
 `);
 
-/* Fetch tools for search */
+/* =============================
+   Fetch tools for search
+============================= */
 const tools: Tool[] = await sanityClient.fetch(`
   *[_type == "tool"]{
     name,
@@ -32,11 +39,13 @@ const tools: Tool[] = await sanityClient.fetch(`
 ---
 
 <Layout>
-  <!-- HERO -->
+  <!-- ================= HERO ================= -->
   <section class="mb-32">
 
     <!-- HEADLINE + SEARCH -->
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 mb-6">
+      
+      <!-- HEADLINE -->
       <h1 class="text-6xl font-bold leading-tight">
         Stop searching.<br />
         <span class="gradient-text">Just use ZapFrame.</span>
@@ -47,19 +56,20 @@ const tools: Tool[] = await sanityClient.fetch(`
         <input
           id="searchInput"
           type="text"
-          placeholder="Search tools…"
+          placeholder="Search tools (CapCut, Canva, DaVinci…) "
           autocomplete="off"
-          class="w-full rounded-2xl border border-gray-200 px-12 py-4 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          class="w-full rounded-2xl border border-gray-200 px-12 py-4 text-sm shadow-sm focus:outline-none focus:ring-0 focus:shadow-[0_0_0_3px_rgba(66,133,244,0.25)]"
         />
 
+        <!-- RAINBOW MAGNIFIER -->
         <span
-  class="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold rainbow-icon"
-  aria-hidden="true"
->
-  🔍
-</span>
+          class="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold rainbow-icon pointer-events-none"
+          aria-hidden="true"
+        >
+          🔍
+        </span>
 
-
+        <!-- SEARCH RESULTS -->
         <ul
           id="results"
           class="absolute z-10 mt-3 w-full rounded-2xl bg-white shadow-lg hidden overflow-hidden"
@@ -67,13 +77,14 @@ const tools: Tool[] = await sanityClient.fetch(`
       </div>
     </div>
 
+    <!-- SUBTEXT -->
     <p class="text-gray-600 max-w-2xl text-lg">
       A curated list of the best free and useful tools for content creators,
       video editors, and beginners.
     </p>
   </section>
 
-  <!-- CATEGORIES -->
+  <!-- ================= CATEGORIES ================= -->
   <section>
     <h2 class="text-2xl font-semibold mb-10">
       Categories
@@ -98,12 +109,13 @@ const tools: Tool[] = await sanityClient.fetch(`
     </ul>
   </section>
 
-  <!-- SEARCH DATA -->
+  <!-- ================= SEARCH DATA ================= -->
   <script id="tools-data" type="application/json">
     {JSON.stringify(tools)}
   </script>
 
-  <!-- SEARCH SCRIPT (AUTOCOMPLETE STYLE) -->
+  <!-- ================= SEARCH SCRIPT ================= -->
+  <!-- Astro-safe, zero TS errors -->
   <script is:inline>
     const tools = JSON.parse(
       document.getElementById("tools-data")?.textContent || "[]"
@@ -128,15 +140,11 @@ const tools: Tool[] = await sanityClient.fetch(`
         return;
       }
 
-      // 1️⃣ Starts-with matches (Play Store style)
+      // Play Store style ordering
       const startsWith = tools.filter(tool =>
         tool.name.toLowerCase().startsWith(value)
       );
 
-       
-
-
-      // 2️⃣ Contains matches (fallback)
       const contains = tools.filter(
         tool =>
           !tool.name.toLowerCase().startsWith(value) &&
@@ -172,21 +180,32 @@ const tools: Tool[] = await sanityClient.fetch(`
     });
   </script>
 
-<style>
-  .rainbow-icon {
-    background: linear-gradient(
-      90deg,
-      #4285f4,
-      #34a853,
-      #fbbc05,
-      #ea4335,
-      #8e24aa
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-</style>
+  <!-- ================= STYLES ================= -->
+  <style>
+    .rainbow-icon {
+      background: linear-gradient(
+        90deg,
+        #4285f4,
+        #34a853,
+        #fbbc05,
+        #ea4335,
+        #8e24aa,
+        #4285f4
+      );
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: rainbow-move 6s linear infinite;
+    }
 
-
+    @keyframes rainbow-move {
+      0% {
+        background-position: 0% 50%;
+      }
+      100% {
+        background-position: 300% 50%;
+      }
+    }
+  </style>
 </Layout>
