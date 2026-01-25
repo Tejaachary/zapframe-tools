@@ -12,6 +12,20 @@ import "../styles/global.css";
       name="description"
       content="ZapFrame — curated tools for creators."
     />
+
+    <!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CFSJFWQ1H0"></script>
+
+<script is:inline>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(...args) {
+    window.dataLayer.push(args);
+  }
+  gtag('js', new Date());
+  gtag('config', 'G-CFSJFWQ1H0');
+</script>
+<!-- End Google Analytics -->
+
   </head>
 
   <body class="antialiased relative">
@@ -44,16 +58,15 @@ import "../styles/global.css";
 
     <!-- Footer -->
     <footer class="border-t border-gray-200 bg-white/70">
-  <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-gray-500 flex flex-col sm:flex-row justify-between gap-2">
-    <span>
-      © {new Date().getFullYear()} ZapFrame — Built for Creators
-    </span>
+      <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-gray-500 flex flex-col sm:flex-row justify-between gap-2">
+        <span>
+          © {new Date().getFullYear()} ZapFrame — Built for Creators
+        </span>
 
-    <span>
-      Built by <strong class="text-gray-700">Teja Chary</strong>
-    </span>
-  </div>
-</footer>
-
+        <span>
+          Built by <strong class="text-gray-700">Teja Chary</strong>
+        </span>
+      </div>
+    </footer>
   </body>
 </html>
