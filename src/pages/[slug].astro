@@ -2,44 +2,41 @@
 import Layout from "../layouts/Layout.astro";
 import { sanityClient } from "../lib/sanity";
 
-/* -----------------------------
+/* =============================
    Types
------------------------------- */
-type CategorySlug = {
-  slug: string;
-};
-
+============================= */
 type Tool = {
   _id: string;
   name: string;
   description: string;
   url: string;
   isFree: boolean;
+  platform: "mobile" | "pc" | "both";
 };
 
-/* -----------------------------
-   Static Paths
------------------------------- */
+/* =============================
+   Static paths
+============================= */
 export async function getStaticPaths() {
-  const categories: CategorySlug[] = await sanityClient.fetch(`
+  const categories: { slug: string }[] = await sanityClient.fetch(`
     *[_type == "category"] {
       "slug": slug.current
     }
   `);
 
-  return categories.map((cat: CategorySlug) => ({
+  return categories.map((cat) => ({
     params: { slug: cat.slug },
   }));
 }
 
-/* -----------------------------
-   Page Params
------------------------------- */
+/* =============================
+   Params
+============================= */
 const slug = Astro.params.slug as string;
 
-/* -----------------------------
-   Fetch Tools
------------------------------- */
+/* =============================
+   Fetch tools
+============================= */
 const tools: Tool[] = await sanityClient.fetch(
   `
   *[_type == "tool" && category->slug.current == $slug] {
@@ -47,15 +44,27 @@ const tools: Tool[] = await sanityClient.fetch(
     name,
     description,
     url,
-    isFree
+    isFree,
+    platform
   }
   `,
   { slug }
 );
 
-/* -----------------------------
-   Title Formatting
------------------------------- */
+/* =============================
+   Split tools
+============================= */
+const mobileTools = tools.filter(
+  (tool) => tool.platform === "mobile" || tool.platform === "both"
+);
+
+const pcTools = tools.filter(
+  (tool) => tool.platform === "pc" || tool.platform === "both"
+);
+
+/* =============================
+   Title
+============================= */
 const title = slug
   .split("-")
   .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -63,44 +72,81 @@ const title = slug
 ---
 
 <Layout>
-  <h1 class="text-5xl font-bold mb-16">
+  <!-- Title -->
+  <h1 class="text-5xl font-bold mb-14">
     <span class="gradient-text">{title}</span>
   </h1>
 
-  {tools.length === 0 ? (
-    <p class="text-gray-500">
-      Tools are being curated. Check back soon.
-    </p>
-  ) : (
-    <ul class="grid gap-10">
-      {tools.map((tool: Tool) => (
-        <li class="glass card-hover rounded-2xl p-6">
-          <div class="flex justify-between items-start">
-            <h2 class="text-lg font-semibold">
-              {tool.name}
-            </h2>
+  <!-- Two Column Layout -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+    
+    <!-- MOBILE COLUMN -->
+    <section>
+      <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+        📱 Mobile
+      </h2>
 
-            {tool.isFree && (
-              <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                Free
-              </span>
-            )}
-          </div>
+      {mobileTools.length === 0 ? (
+        <p class="text-gray-500">No mobile tools added yet.</p>
+      ) : (
+        <ul class="space-y-6">
+          {mobileTools.map((tool) => (
+            <li class="glass card-hover rounded-2xl p-6">
+              <h3 class="text-lg font-semibold">
+                {tool.name}
+              </h3>
 
-          <p class="text-gray-500 mt-3 text-sm">
-            {tool.description}
-          </p>
+              <p class="text-gray-500 mt-2 text-sm">
+                {tool.description}
+              </p>
 
-          <a
-            href={tool.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-block mt-4 text-blue-600 hover:underline text-sm"
-          >
-            Visit tool →
-          </a>
-        </li>
-      ))}
-    </ul>
-  )}
+              <a
+                href={tool.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-block mt-4 text-sm font-medium text-blue-600 hover:underline"
+              >
+                Download tool →
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+
+    <!-- PC COLUMN -->
+    <section>
+      <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+        💻 PC
+      </h2>
+
+      {pcTools.length === 0 ? (
+        <p class="text-gray-500">No PC tools added yet.</p>
+      ) : (
+        <ul class="space-y-6">
+          {pcTools.map((tool) => (
+            <li class="glass card-hover rounded-2xl p-6">
+              <h3 class="text-lg font-semibold">
+                {tool.name}
+              </h3>
+
+              <p class="text-gray-500 mt-2 text-sm">
+                {tool.description}
+              </p>
+
+              <a
+                href={tool.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-block mt-4 text-sm font-medium text-blue-600 hover:underline"
+              >
+                Download tool →
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+
+  </div>
 </Layout>
