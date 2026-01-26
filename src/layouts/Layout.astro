@@ -7,66 +7,52 @@ import "../styles/global.css";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>ZapFrame</title>
-    <meta
-      name="description"
-      content="ZapFrame — curated tools for creators."
+    <meta name="description" content="ZapFrame — curated tools for creators." />
+
+    <!-- Font: Inter (for clean, strong text rendering) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap"
+      rel="stylesheet"
     />
-
-    <!-- Google Analytics (GA4) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CFSJFWQ1H0"></script>
-
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(...args) {
-        window.dataLayer.push(args);
-      }
-      gtag('js', new Date());
-      gtag('config', 'G-CFSJFWQ1H0');
-    </script>
-    <!-- End Google Analytics -->
   </head>
 
-  <body class="antialiased relative">
-    <!-- Header -->
-    <header class="bg-white/70 backdrop-blur border-b border-gray-200">
+  <body class="antialiased text-slate-100">
+
+    <!-- HEADER -->
+    <header class="glass border-b border-white/20">
       <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-        <a href="/" class="text-xl font-bold flex items-center gap-2">
-          ⚡ <span class="gradient-text">ZapFrame</span>
+
+        <!-- LOGO (FIXED BASELINE + WEIGHT) -->
+        <a href="/" class="flex items-center gap-2 leading-none">
+          <span class="text-xl font-bold text-white translate-y-[1px]">⚡</span>
+          <span class="text-xl font-extrabold tracking-tight gradient-text">
+            ZapFrame
+          </span>
         </a>
 
-        <span class="text-sm text-gray-500">
+        <span class="text-sm text-slate-200">
           Curated creator tools
         </span>
       </div>
     </header>
 
-    <!-- Floating Symbols -->
-    <div class="pointer-events-none">
-      <span class="floating-icon" style="top: 120px; left: 10%">🎬</span>
-      <span class="floating-icon" style="top: 260px; left: 80%">🎵</span>
-      <span class="floating-icon" style="top: 420px; left: 25%">✂️</span>
-      <span class="floating-icon" style="top: 180px; left: 60%">📸</span>
-      <span class="floating-icon" style="top: 520px; left: 75%">🖥️</span>
-    </div>
-
-    <!-- Page Content -->
-    <main class="max-w-6xl mx-auto px-4 py-20 relative z-10">
+    <!-- PAGE CONTENT -->
+    <main class="max-w-6xl mx-auto px-4 py-20">
       <slot />
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-gray-200 bg-white/70">
-      <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-gray-500 flex flex-col sm:flex-row justify-between gap-2">
+    <!-- FOOTER -->
+    <footer class="glass border-t border-white/20 mt-20">
+      <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-slate-200 flex justify-between">
+        <span>© {new Date().getFullYear()} ZapFrame</span>
         <span>
-          © {new Date().getFullYear()} ZapFrame — Built for Creators
-        </span>
-
-        <span>
-          Built by <strong class="text-gray-700">Teja Chary</strong>
+          Built by <strong class="text-white">Teja Chary</strong>
         </span>
       </div>
     </footer>
+
   </body>
 </html>

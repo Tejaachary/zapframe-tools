@@ -1,4 +1,5 @@
 ---
+// src/pages/index.astro — FINAL (NO SEARCH)
 import Layout from "../layouts/Layout.astro";
 import { sanityClient } from "../lib/sanity";
 
@@ -8,12 +9,6 @@ type Category = {
   slug: string;
 };
 
-type SearchTool = {
-  name: string;
-  slug: string;
-  categorySlug: string;
-};
-
 const categories: Category[] = await sanityClient.fetch(`
   *[_type == "category"]{
     _id,
@@ -21,62 +16,57 @@ const categories: Category[] = await sanityClient.fetch(`
     "slug": slug.current
   }
 `);
-
-const tools: SearchTool[] = await sanityClient.fetch(`
-  *[_type == "tool"]{
-    name,
-    "slug": slug.current,
-    "categorySlug": category->slug.current
-  }
-`);
 ---
 
 <Layout>
   <!-- HERO -->
-  <section class="mb-32">
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 mb-6">
-
-      <h1 class="text-6xl font-bold leading-tight">
+  <section class="mb-28">
+    <div class="max-w-2xl">
+      <h1 class="text-6xl font-bold leading-tight text-white">
         Stop searching.<br />
         <span class="gradient-text">Just use ZapFrame.</span>
       </h1>
 
-      <!-- SEARCH -->
-      <div class="relative w-full lg:w-[420px]">
-        <input
-          id="searchInput"
-          type="text"
-          placeholder="Search tools (CapCut, Canva, DaVinci)"
-          autocomplete="off"
-          class="w-full rounded-2xl border border-gray-200 px-12 py-4 text-sm shadow-sm focus:outline-none"
-        />
-
-        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xl rainbow-icon">
-          🔍
-        </span>
-
-        <ul
-          id="results"
-          class="absolute z-50 mt-3 w-full rounded-2xl bg-white shadow-lg hidden overflow-hidden"
-        ></ul>
-      </div>
+      <p class="mt-6 text-slate-300 text-lg">
+        A curated list of the best free tools for creators.
+      </p>
     </div>
-
-    <p class="text-gray-600 max-w-2xl text-lg">
-      A curated list of the best free tools for creators.
-    </p>
   </section>
 
   <!-- CATEGORIES -->
   <section>
-    <h2 class="text-2xl font-semibold mb-10">Categories</h2>
+    <h2 class="text-4xl font-bold mb-3 text-white">
+      Categories
+    </h2>
 
-    <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-      {categories.map((cat) => (
+    <p class="text-slate-300 mb-10 max-w-2xl">
+      Discover the best tools organized by category
+    </p>
+
+    <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {categories.map(cat => (
         <li>
-          <a href={`/${cat.slug}`} class="glass card-hover block rounded-2xl p-8">
-            <h3 class="text-xl font-semibold mb-2">{cat.name}</h3>
-            <p class="text-sm text-gray-500">
+          <a
+            href={`/${cat.slug}`}
+            class="
+              glass
+              block
+              rounded-xl
+              p-6
+              h-full
+              transition
+              hover:-translate-y-1
+            "
+          >
+            <div class="w-14 h-14 mb-5 rounded-xl bg-pink-500/20 flex items-center justify-center mx-auto">
+              <span class="text-xl">🎬</span>
+            </div>
+
+            <h3 class="text-xl font-semibold mb-3 text-white text-center">
+              {cat.name}
+            </h3>
+
+            <p class="text-sm text-slate-300 text-center">
               Best tools for {cat.name.toLowerCase()}
             </p>
           </a>
@@ -84,117 +74,4 @@ const tools: SearchTool[] = await sanityClient.fetch(`
       ))}
     </ul>
   </section>
-
-  <!-- DATA -->
-  <script id="tools-data" type="application/json">
-    {JSON.stringify(tools)}
-  </script>
-
-  <!-- SEARCH LOGIC -->
-  <script is:inline>
-  const tools = JSON.parse(
-    document.getElementById("tools-data")?.textContent || "[]"
-  );
-
-  const input = document.getElementById("searchInput");
-  const results = document.getElementById("results");
-
-  if (!input || !results) throw new Error("Search elements missing");
-
-  function score(name, query) {
-    name = name.toLowerCase();
-    query = query.toLowerCase();
-
-    if (name.startsWith(query)) return 100;
-    if (name.includes(query)) return 50;
-
-    // fuzzy match
-    let i = 0;
-    for (const c of name) {
-      if (c === query[i]) i++;
-    }
-    return i === query.length ? 10 : 0;
-  }
-
-  function highlight(text, q) {
-    return text.replace(
-      new RegExp(`(${q})`, "ig"),
-      "<strong>$1</strong>"
-    );
-  }
-
-  function getBestMatch(query) {
-    return tools
-      .map(t => ({ ...t, s: score(t.name, query) }))
-      .filter(t => t.s > 0)
-      .sort((a, b) => b.s - a.s)[0];
-  }
-
-  input.addEventListener("input", () => {
-    const q = input.value.trim().toLowerCase();
-    results.innerHTML = "";
-
-    if (!q) {
-      results.classList.add("hidden");
-      return;
-    }
-
-    const matches = tools
-      .map(t => ({ ...t, s: score(t.name, q) }))
-      .filter(t => t.s > 0)
-      .sort((a, b) => b.s - a.s)
-      .slice(0, 6);
-
-    if (!matches.length) {
-      results.innerHTML =
-        `<li class="px-4 py-3 text-sm text-gray-500">No tools found</li>`;
-      results.classList.remove("hidden");
-      return;
-    }
-
-    matches.forEach(t => {
-      const li = document.createElement("li");
-      li.className =
-        "px-4 py-3 text-sm cursor-pointer hover:bg-gray-100";
-      li.innerHTML = `🔎 ${highlight(t.name, q)}`;
-
-      li.onclick = () => {
-        window.location.href = `/${t.categorySlug}#${t.slug}`;
-      };
-
-      results.appendChild(li);
-    });
-
-    results.classList.remove("hidden");
-  });
-
-  // ✅ THIS IS THE IMPORTANT PART
-  input.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter") return;
-
-    const q = input.value.trim().toLowerCase();
-    if (!q) return;
-
-    const best = getBestMatch(q);
-    if (!best) return;
-
-    window.location.href = `/${best.categorySlug}#${best.slug}`;
-  });
-</script>
-
-  <style>
-    .rainbow-icon {
-      background: linear-gradient(
-        90deg,
-        #4285f4,
-        #34a853,
-        #fbbc05,
-        #ea4335,
-        #8e24aa
-      );
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-  </style>
 </Layout>
