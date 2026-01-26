@@ -7,27 +7,41 @@ import "../styles/global.css";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>ZapFrame</title>
     <meta name="description" content="ZapFrame — curated tools for creators." />
 
-    <!-- Font: Inter (for clean, strong text rendering) -->
+    <!-- Font: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Google Analytics (GA4) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-9P26TYDJR2">
+    </script>
+
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ window.dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-9P26TYDJR2');
+    </script>
   </head>
 
-  <body class="antialiased text-slate-100">
+  <body class="antialiased text-slate-100 font-[Inter]">
 
     <!-- HEADER -->
     <header class="glass border-b border-white/20">
       <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
 
-        <!-- LOGO (FIXED BASELINE + WEIGHT) -->
+        <!-- LOGO -->
         <a href="/" class="flex items-center gap-2 leading-none">
-          <span class="text-xl font-bold text-white translate-y-[1px]">⚡</span>
+          <span class="text-xl font-bold text-white translate-y-px">⚡</span>
           <span class="text-xl font-extrabold tracking-tight gradient-text">
             ZapFrame
           </span>
