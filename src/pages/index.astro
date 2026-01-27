@@ -8,6 +8,15 @@ type Category = {
   slug: string;
 };
 
+/* ✅ CATEGORY → EMOJI MAP (MATCH SLUGS) */
+const categoryIcons: Record<string, string> = {
+  "photo-editing": "🖼️",
+  "video-editing": "🎬",
+  "audio-editing": "🎧",
+  "thumbnail-tools": "🧩",
+  "ai-tools": "🤖",
+};
+
 const categories: Category[] = await sanityClient.fetch(`
   *[_type == "category"]{
     _id,
@@ -22,22 +31,18 @@ const categories: Category[] = await sanityClient.fetch(`
   <section class="mb-28">
     <div class="max-w-2xl">
 
-      <!-- ✅ SEO-FRIENDLY H1 (VERY IMPORTANT) -->
       <h1 class="text-6xl font-bold leading-tight text-white">
         ZapFrame Tools
       </h1>
 
-      <!-- SLOGAN (still visible, not H1) -->
       <p class="mt-3 text-2xl font-semibold gradient-text">
         Stop searching. Just use ZapFrame.
       </p>
 
-      <!-- CLEAR DESCRIPTION -->
       <p class="mt-6 text-slate-300 text-lg">
         A curated platform to discover the best free tools for content creators and video editors.
       </p>
 
-      <!-- ✅ BRAND DEFINITION FOR GOOGLE (invisible to users) -->
       <p class="sr-only">
         ZapFrame Tools is a website that curates the best free tools for content creators and video editors.
       </p>
@@ -71,7 +76,10 @@ const categories: Category[] = await sanityClient.fetch(`
             "
           >
             <div class="w-14 h-14 mb-5 rounded-xl bg-pink-500/20 flex items-center justify-center mx-auto">
-              <span class="text-xl">🎬</span>
+              <!-- ✅ DYNAMIC EMOJI -->
+              <span class="text-xl">
+                {categoryIcons[cat.slug] ?? "⚡"}
+              </span>
             </div>
 
             <h3 class="text-xl font-semibold mb-3 text-white text-center">
