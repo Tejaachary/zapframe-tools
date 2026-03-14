@@ -27,103 +27,122 @@ const categories: Category[] = await sanityClient.fetch(`
 
 <Layout>
 
-  <!-- HERO -->
-  <section class="relative mb-32">
+<!-- HERO -->
 
-    <!-- Cinematic light -->
-    <div class="ai-light top-[-300px] left-[-200px]"></div>
+<section class="relative pt-28 pb-36 overflow-hidden">
 
-    <div class="max-w-3xl relative z-10">
+<div class="hero-light top-[-250px] left-[20%]"></div>
+<div class="hero-light bottom-[-300px] right-[10%] opacity-50"></div>
 
-      <h1 class="text-6xl font-bold leading-tight text-white">
-        ZapFrame
-        <span class="gradient-text">Tools</span>
-      </h1>
+<div class="max-w-6xl mx-auto grid md:grid-cols-[240px_1fr] gap-8 items-center">
 
-      <p class="mt-4 text-2xl font-semibold text-sky-400">
-        Stop searching. Just use ZapFrame.
-      </p>
+<div class="flex justify-center md:justify-end">
 
-      <p class="mt-6 text-slate-300 text-lg max-w-xl">
-        A curated platform to discover the best free tools for content creators and video editors.
-      </p>
+<div class="hero-avatar">
 
-      <div class="mt-10">
-        <a
-          href="#categories"
-          class="btn-ai"
-        >
-          Explore Categories
-        </a>
-      </div>
+<img src="/hero.png" alt="Creator tools">
 
-    </div>
+</div>
 
-  </section>
+</div>
 
-  <!-- CATEGORIES -->
-  <section id="categories">
+<div>
 
-    <h2 class="text-4xl font-bold mb-3 text-white">
-      Categories
-    </h2>
+<h1 class="text-6xl md:text-7xl font-bold leading-[1.05] text-white">
 
-    <p class="text-slate-300 mb-12 max-w-2xl">
-      Discover the best tools organized by category
-    </p>
+Mana.Core  
+<span class="gradient-text">Tools</span>
 
-    <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+</h1>
 
-      {categories.map(cat => (
+<p class="mt-6 text-xl text-slate-300">
 
-        <li>
+Stop searching. Just use Mana.core.
 
-          <a
-            href={`/${cat.slug}`}
-            class="
-              card-ai
-              block
-              rounded-xl
-              p-8
-              h-full
-              text-center
-              group
-            "
-          >
+</p>
 
-            <!-- icon -->
-            <div class="
-              w-16 h-16
-              mb-6
-              rounded-xl
-              bg-white/5
-              flex
-              items-center
-              justify-center
-              mx-auto
-              text-2xl
-              group-hover:scale-110
-              transition
-            ">
-              {categoryIcons[cat.slug] ?? "⚡"}
-            </div>
+<p class="mt-4 text-slate-400 text-lg max-w-xl">
 
-            <h3 class="text-xl font-semibold mb-2 text-white">
-              {cat.name}
-            </h3>
+Discover the best free tools for creators, editors, and builders — all curated in one place.
 
-            <p class="text-sm text-slate-400">
-              Best tools for {cat.name.toLowerCase()}
-            </p>
+</p>
 
-          </a>
+<div class="mt-10 flex flex-wrap gap-4">
 
-        </li>
+<a href="#categories" class="btn-ai">
 
-      ))}
+Explore Categories
 
-    </ul>
+</a>
 
-  </section>
+<a href="#" class="px-6 py-3 rounded-xl border border-white/10 text-slate-200 hover:bg-white/5 transition">
+
+Browse Tools
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- CATEGORIES -->
+
+<section id="categories" class="pb-36">
+
+<div class="max-w-6xl mx-auto">
+
+<h2 class="text-4xl font-bold text-white mb-3">
+
+Categories
+
+</h2>
+
+<p class="text-slate-400 mb-16 max-w-xl">
+
+Explore curated tools organized by creator workflows.
+
+</p>
+
+<ul class="grid grid-cols-1 sm:grid-cols-2 gap-12 max-w-4xl">
+
+{categories.map(cat => (
+
+<li>
+
+<a href={`/${cat.slug}`} class="category-card group block p-10 text-center">
+
+<div class="icon-box mb-6 mx-auto">
+
+{categoryIcons[cat.slug] ?? "⚡"}
+
+</div>
+
+<h3 class="text-2xl font-semibold text-white mb-2">
+
+{cat.name}
+
+</h3>
+
+<p class="text-sm text-slate-400">
+
+Discover tools for {cat.name.toLowerCase()}
+
+</p>
+
+</a>
+
+</li>
+
+))}
+
+</ul>
+
+</div>
+
+</section>
 
 </Layout>

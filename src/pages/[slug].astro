@@ -1,5 +1,4 @@
 ---
-// src/pages/[slug].astro — FINAL CLEAN VERSION (UPDATED)
 import Layout from "../layouts/Layout.astro";
 import { sanityClient } from "../lib/sanity";
 
@@ -21,213 +20,177 @@ export async function getStaticPaths() {
   const cats: { slug: string }[] = await sanityClient.fetch(`
     *[_type == "category"]{ "slug": slug.current }
   `);
+
   return cats.map(c => ({ params: { slug: c.slug } }));
 }
 
 const slug = Astro.params.slug as string;
 
 const tools: Tool[] = await sanityClient.fetch(
-  `*[_type=="tool" && category->slug.current==$slug]{
-    _id,
-    name,
-    "slug": slug.current,
-    description,
-    url,
-    isFree,
-    platform,
-    featured,
-    "logoUrl": logo.asset->url,
-    rating,
-    downloads
-  }`,
-  { slug }
-);
+`*[_type=="tool" && category->slug.current==$slug]{
+  _id,
+  name,
+  "slug": slug.current,
+  description,
+  url,
+  isFree,
+  platform,
+  featured,
+  "logoUrl": logo.asset->url,
+  rating,
+  downloads
+}`, { slug });
 
-const featuredTools = tools.filter(t => t.featured);
-const regularTools = tools.filter(t => !t.featured);
+const featured = tools.filter(t => t.featured);
+const regular = tools.filter(t => !t.featured);
 
-const mobileTools = featuredTools
-  .filter(t => t.platform === "mobile" || t.platform === "both")
-  .concat(regularTools.filter(t => t.platform === "mobile" || t.platform === "both"));
-
-const pcTools = featuredTools
-  .filter(t => t.platform === "pc" || t.platform === "both")
-  .concat(regularTools.filter(t => t.platform === "pc" || t.platform === "both"));
-
-const titleWords = slug
+const title = slug
   .split("-")
   .map(w => w[0].toUpperCase() + w.slice(1))
   .join(" ");
 ---
 
-<Layout title={titleWords}>
+<Layout title={title}>
 
-  <!-- PAGE TITLE -->
-  <h1 class="text-5xl font-bold mb-10 text-white flex items-center gap-3">
-    🎬 <span class="gradient-text">{titleWords}</span>
+<!-- PAGE HEADER -->
+<section class="mb-14">
+
+  <h1 class="text-5xl font-bold flex items-center gap-3">
+    🎬 <span class="gradient-text">{title}</span>
   </h1>
 
-  {tools.length === 0 && (
-    <div class="glass rounded-xl p-10 text-center">
-      <p class="text-slate-300">No tools in this category yet</p>
-    </div>
-  )}
+  <p class="text-slate-400 mt-3">
+    Curated tools for {title.toLowerCase()}
+  </p>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+</section>
 
-    <!-- 📱 MOBILE TOOLS -->
-    <section>
-      <h2 class="text-2xl font-semibold mb-5 text-white">
-        📱 Mobile
-        {mobileTools.length === 0 && (
-          <span class="ml-2 text-sm text-slate-300">(Coming soon)</span>
-        )}
-      </h2>
 
-      {mobileTools.length > 0 ? (
-        <ul class="space-y-5">
-          {mobileTools.map(tool => (
-            <li
-              id={tool.slug}
-              class="glass p-5 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:perspective-1000"
-            >
-              {tool.featured && (
-                <div class="mb-2 text-xs font-semibold text-pink-300">
-                   Recommended 🔥
-                </div>
-              )}
+<!-- FEATURED TOOLS -->
+{featured.length > 0 && (
 
-              {tool.logoUrl && (
-                <img
-                  src={tool.logoUrl}
-                  alt={`${tool.name} logo`}
-                  class="w-12 h-12 mb-4 object-contain rounded-lg"
-                  loading="lazy"
-                />
-              )}
+<section class="mb-16">
 
-              <h3 class="font-semibold text-lg text-white mb-2">
-                {tool.name}
-              </h3>
+<h2 class="text-2xl font-semibold mb-6 text-white">
+🔥 Featured Tools
+</h2>
 
-              <p class="text-sm text-slate-300 mb-4">
-                {tool.description}
-              </p>
+<ul class="grid md:grid-cols-2 gap-6">
 
-              {tool.rating && (
-                <div class="text-xs text-slate-400 mb-2">
-                  ⭐ {tool.rating}/5
-                </div>
-              )}
-              
-              {tool.downloads && (
-                <div class="text-xs text-slate-400 mb-4">
-                  📥 {tool.downloads}
-                </div>
-              )}
+{featured.map(tool => (
 
-              <div class="flex items-center gap-3 flex-wrap">
-                <a
-                  href={tool.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="px-4 py-2 text-sm rounded-lg bg-pink-500/80 hover:bg-pink-500 text-white transition-all duration-300"
-                >
-                  Download
-                </a>
+<li class="glass p-6 rounded-xl border border-pink-500/20 hover:border-pink-500/40 transition">
 
-                {tool.isFree && (
-                  <span class="text-xs text-pink-200 border border-white/20 px-3 py-1 rounded-full">
-                    Free
-                  </span>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div class="glass p-10 text-center">
-          <p class="text-slate-300">No mobile tools yet</p>
-        </div>
-      )}
-    </section>
+{tool.logoUrl && (
+<img
+src={tool.logoUrl}
+alt={tool.name}
+class="w-14 h-14 mb-4 rounded-lg object-contain"
+/>
+)}
 
-    <!-- 💻 PC TOOLS -->
-    <section>
-      <h2 class="text-2xl font-semibold mb-5 text-white">
-        💻 PC
-        {pcTools.length === 0 && (
-          <span class="ml-2 text-sm text-slate-300">(Coming soon)</span>
-        )}
-      </h2>
+<h3 class="text-xl font-semibold mb-2">
+{tool.name}
+</h3>
 
-      {pcTools.length > 0 ? (
-        <ul class="space-y-5">
-          {pcTools.map(tool => (
-            <li
-              id={tool.slug}
-              class="glass p-5 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:perspective-1000"
-            >
-              {tool.featured && (
-                <div class="mb-2 text-xs font-semibold text-pink-300">
-                   Recommended 🔥
-                </div>
-              )}
+<p class="text-slate-300 text-sm mb-4">
+{tool.description}
+</p>
 
-              {tool.logoUrl && (
-                <img
-                  src={tool.logoUrl}
-                  alt={`${tool.name} logo`}
-                  class="w-12 h-12 mb-4 object-contain rounded-lg"
-                  loading="lazy"
-                />
-              )}
+<div class="flex items-center gap-4 text-xs text-slate-400 mb-4">
 
-              <h3 class="font-semibold text-lg text-white mb-2">
-                {tool.name}
-              </h3>
+{tool.rating && <span>⭐ {tool.rating}/5</span>}
+{tool.downloads && <span>📥 {tool.downloads}</span>}
+<span>💻 {tool.platform}</span>
 
-              <p class="text-sm text-slate-300 mb-4">
-                {tool.description}
-              </p>
+</div>
 
-              {tool.rating && (
-                <div class="text-xs text-slate-400 mb-2">
-                  ⭐ {tool.rating}/5
-                </div>
-              )}
-              
-              {tool.downloads && (
-                <div class="text-xs text-slate-400 mb-4">
-                  📥 {tool.downloads}
-                </div>
-              )}
+<a
+href={tool.url}
+target="_blank"
+rel="noopener noreferrer"
+class="btn-ai text-sm"
+>
+Visit Tool
+</a>
 
-              <div class="flex items-center gap-3 flex-wrap">
-                <a
-                  href={tool.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="px-4 py-2 text-sm rounded-lg bg-pink-500/80 hover:bg-pink-500 text-white transition-all duration-300"
-                >
-                  Download
-                </a>
+</li>
 
-                {tool.isFree && (
-                  <span class="text-xs text-pink-200 border border-white/20 px-3 py-1 rounded-full">
-                    Free
-                  </span>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div class="glass p-10 text-center">
-          <p class="text-slate-300">No PC tools yet</p>
-        </div>
-      )}
-    </section>
+))}
 
-  </div>
+</ul>
+
+</section>
+
+)}
+
+
+<!-- ALL TOOLS -->
+<section>
+
+<h2 class="text-2xl font-semibold mb-6 text-white">
+All Tools
+</h2>
+
+{regular.length === 0 ? (
+
+<div class="glass p-10 text-center">
+<p class="text-slate-300">
+No tools in this category yet
+</p>
+</div>
+
+) : (
+
+<ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+{regular.map(tool => (
+
+<li class="glass p-5 rounded-xl hover:-translate-y-1 transition">
+
+{tool.logoUrl && (
+<img
+src={tool.logoUrl}
+alt={tool.name}
+class="w-12 h-12 mb-4 object-contain rounded"
+/>
+)}
+
+<h3 class="font-semibold mb-2">
+{tool.name}
+</h3>
+
+<p class="text-sm text-slate-400 mb-4">
+{tool.description}
+</p>
+
+<div class="flex items-center justify-between">
+
+<a
+href={tool.url}
+target="_blank"
+rel="noopener noreferrer"
+class="text-sm text-pink-400 hover:text-pink-300"
+>
+Open →
+</a>
+
+{tool.isFree && (
+<span class="text-xs border border-white/20 px-2 py-1 rounded">
+Free
+</span>
+)}
+
+</div>
+
+</li>
+
+))}
+
+</ul>
+
+)}
+
+</section>
+
 </Layout>
